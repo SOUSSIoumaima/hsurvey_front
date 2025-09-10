@@ -59,6 +59,13 @@ jobs:
             echo "Waiting..."
             sleep 2
           done
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          INTERNAL_SERVICE_SECRET: ${{ secrets.INTERNAL_SERVICE_SECRET }}
+          SHARED_DB_USER: ${{ secrets.SHARED_DB_USER }}
+          SHARED_DB_PASSWORD: ${{ secrets.SHARED_DB_PASSWORD }}
+          SHARED_DB_NAME: ${{ secrets.SHARED_DB_NAME }}
+          REACT_APP_API_URL: http://localhost:8080/api
 
       - name: Set up Python
         uses: actions/setup-python@v4
