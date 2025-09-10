@@ -80,7 +80,7 @@ jobs:
 
       - name: Install Selenium dependencies
         run: |
-          pip install selenium pytest webdriver-manager
+          pip install selenium pytest webdriver-manager pytest-order
 
       - name: Run Selenium tests
         run: pytest tests/
