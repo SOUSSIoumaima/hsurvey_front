@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Tailwind utility classes for reuse */
+.input-base {
+  @apply w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all;
+}
+.label-base {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+.table-cell-base {
+  @apply px-6 py-4 whitespace-nowrap;
+}
+
+/* Card container */
+.card-base {
+  @apply bg-white rounded-lg shadow-sm border p-6;
+}
+
+/* Section header */
+.section-header {
+  @apply text-xl font-semibold text-gray-900;
+}
+
+/* Table cell */
+.table-cell-base {
+  @apply px-6 py-4 whitespace-nowrap;
+}
+
+/* Table header cell */
+.table-header-base {
+  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+/* Tag styles */
+.tag-base {
+  @apply px-2 py-1 text-xs rounded-full;
+}
+.tag-blue {
+  @apply bg-blue-100 text-blue-800;
+}
+.tag-gray {
+  @apply bg-gray-100 text-gray-800;
+}
+
+/* Icon button */
+.icon-btn {
+  @apply text-blue-600 hover:text-blue-900;
+}
+.icon-btn-green {
+  @apply text-green-600 hover:text-green-900;
+}
+.icon-btn-red {
+  @apply text-red-600 hover:text-red-900;
+}
+.icon-btn-purple {
+  @apply text-purple-600 hover:text-purple-900;
+}
+
+.error-box {
+  @apply mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded;
+}
+
+.dashboard-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+.flex-between {
+  @apply flex items-center justify-between;
+}
+.flex-center {
+  @apply flex items-center justify-center;
+}
