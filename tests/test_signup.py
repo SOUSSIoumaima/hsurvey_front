@@ -1,6 +1,7 @@
 import pytest
 import time
 import tempfile
+import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,7 +10,10 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.action_chains import ActionChains
-
+@pytest.fixture
+def base_url():
+    # prend l'URL depuis l'environnement, sinon fallback localhost
+    return os.environ.get("REACT_APP_API_URL", "http://localhost:3000")
 # ------------------------------
 # Fixture Selenium avec options
 # ------------------------------
@@ -48,8 +52,8 @@ def driver():
 
 
 @pytest.mark.order(1)
-def test_full_signup_flow(driver):
-    driver.get("http://localhost:3000/")
+def test_full_signup_flow(driver,base_url):
+    driver.get(base_url)
     
     # Cliquer sur "Sign up here"
     signup_button = WebDriverWait(driver, 10).until(
@@ -93,8 +97,8 @@ def test_full_signup_flow(driver):
     assert dashboard_header.is_displayed()
 
 @pytest.mark.order(2)    
-def test_existing_organization_error(driver):
-    driver.get("http://localhost:3000/")
+def test_existing_organization_error(driver, base_url):
+    driver.get(base_url)
 
     # Cliquer sur "Sign up here"
     signup_button = WebDriverWait(driver, 10).until(
@@ -123,8 +127,8 @@ def test_existing_organization_error(driver):
 # ------------------------------
 # Fonction utilitaire
 # ------------------------------
-def get_invite_code(driver):
-    driver.get("http://localhost:3000/")
+def get_invite_code(driver, base_url):
+    driver.get(base_url)
 
     # Connexion admin
     email_input = WebDriverWait(driver, 10).until(
@@ -177,12 +181,12 @@ def get_invite_code(driver):
     return invite_code
 
 @pytest.mark.order(4)
-def test_signup_existing_org_flow(driver):
+def test_signup_existing_org_flow(driver, base_url):
     # Récupérer le code d'invitation via le helper
-    invite_code = get_invite_code(driver)
+    invite_code = get_invite_code(driver,base_url)
     
     # Aller sur la page d'accueil et cliquer sur "Sign up here"
-    driver.get("http://localhost:3000/")
+    driver.get(base_url)
     WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Sign up here')]"))
     ).click()

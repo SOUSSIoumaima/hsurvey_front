@@ -1,6 +1,7 @@
 import pytest
 import time
 import tempfile
+import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,7 +10,10 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.action_chains import ActionChains
-
+@pytest.fixture
+def base_url():
+    # prend l'URL depuis l'environnement, sinon fallback localhost
+    return os.environ.get("REACT_APP_API_URL", "http://localhost:3000")
 # ------------------------------
 # Fixture Selenium avec options
 # ------------------------------
@@ -46,8 +50,8 @@ def driver():
 
 
 @pytest.mark.order(16)
-def test_publish_assign_department_team(driver):
-    driver.get("http://localhost:3000/")
+def test_publish_assign_department_team(driver,base_url):
+    driver.get(base_url)
 
     # --- Connexion ---
     email_input = WebDriverWait(driver, 10).until(
