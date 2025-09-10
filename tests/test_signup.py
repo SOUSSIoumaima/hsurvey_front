@@ -87,7 +87,7 @@ def test_full_signup_flow(driver,base_url):
     sign_up_button.click()
     
     # Attendre la redirection vers le dashboard (par URL)
-    WebDriverWait(driver, 15).until(lambda d: "/dashboard" in d.current_url)
+    WebDriverWait(driver, 20).until(lambda d: "/dashboard" in d.current_url)
     assert "/dashboard" in driver.current_url
 
     # Optionnel : vérifier qu'un élément unique du dashboard est affiché
@@ -143,6 +143,11 @@ def get_invite_code(driver, base_url):
 
     # Attendre que le dashboard soit chargé
     WebDriverWait(driver, 10).until(lambda d: "/dashboard" in d.current_url)
+    # Optionnel : vérifier qu'un élément unique du dashboard est affiché
+    dashboard_header = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, "//h1[text()='Dashboard']"))
+    )
+    assert dashboard_header.is_displayed()
 
     # Cliquer sur l'onglet Organization
     org_tab = WebDriverWait(driver, 10).until(

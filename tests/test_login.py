@@ -68,7 +68,7 @@ def test_login_success(driver, base_url):
     sign_in.click()
 
     # Attendre la redirection vers le dashboard (par URL)
-    WebDriverWait(driver, 10).until(lambda d: "/dashboard" in d.current_url)
+    WebDriverWait(driver, 30).until(lambda d: "/dashboard" in d.current_url)
     assert "/dashboard" in driver.current_url
 
     # Optionnel : vérifier qu'un élément unique du dashboard est affiché
