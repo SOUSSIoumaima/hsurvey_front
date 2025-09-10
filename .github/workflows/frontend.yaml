@@ -65,7 +65,7 @@ jobs:
           SHARED_DB_USER: ${{ secrets.SHARED_DB_USER }}
           SHARED_DB_PASSWORD: ${{ secrets.SHARED_DB_PASSWORD }}
           SHARED_DB_NAME: ${{ secrets.SHARED_DB_NAME }}
-          REACT_APP_API_URL: http://localhost:8080/api
+          REACT_APP_API_URL: http://gateway:8080/api
           REACT_APP_URL: http://localhost:3000 
           
 
