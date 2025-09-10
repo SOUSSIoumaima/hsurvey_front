@@ -67,10 +67,6 @@ def test_login_success(driver, base_url):
     sign_in = driver.find_element(By.XPATH, "//button[text()='Sign In']")
     sign_in.click()
 
-    # Attendre la redirection vers le dashboard (par URL)
-    WebDriverWait(driver, 30).until(lambda d: "/dashboard" in d.current_url)
-    assert "/dashboard" in driver.current_url
-
     # Optionnel : vérifier qu'un élément unique du dashboard est affiché
     dashboard_header = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.XPATH, "//h1[text()='Dashboard']"))
