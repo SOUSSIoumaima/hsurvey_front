@@ -51,7 +51,7 @@ jobs:
         run: |
           docker compose up -d
           # attendre que le front et gateway répondent
-            for i in {1..60}; do
+          for i in {1..30}; do
             if curl -s http://localhost:3000 && curl -s http://localhost:8080; then
               echo "Services ready!"
               break
@@ -65,7 +65,9 @@ jobs:
           SHARED_DB_USER: ${{ secrets.SHARED_DB_USER }}
           SHARED_DB_PASSWORD: ${{ secrets.SHARED_DB_PASSWORD }}
           SHARED_DB_NAME: ${{ secrets.SHARED_DB_NAME }}
-          REACT_APP_API_URL: http://localhost:3000  
+          REACT_APP_API_URL: http://localhost:8080/api
+          REACT_APP_URL: http://localhost:3000 
+          
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -73,9 +75,10 @@ jobs:
           python-version: '3.11'
 
       - name: Install Selenium dependencies
-        run: pip install selenium pytest webdriver-manager
+        run: |
+          pip install selenium pytest webdriver-manager
 
       - name: Run Selenium tests
         run: pytest tests/
         env:
-          REACT_APP_API_URL: http://localhost:3000
+          REACT_APP_URL: http://localhost:3000

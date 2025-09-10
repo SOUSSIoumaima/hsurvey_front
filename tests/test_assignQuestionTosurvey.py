@@ -1,6 +1,7 @@
 import pytest
 import time
 import tempfile
+import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -10,6 +11,10 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.action_chains import ActionChains
 
+@pytest.fixture
+def base_url():
+    # prend l'URL depuis l'environnement, sinon fallback localhost
+    return os.environ.get("REACT_APP_URL", "http://localhost:3000")
 # ------------------------------
 # Fixture Selenium avec options
 # ------------------------------
@@ -45,8 +50,8 @@ def driver():
     driver.quit()
 
 @pytest.mark.order(10)
-def test_assignQuestionToSurvey(driver):
-    driver.get("http://localhost:3000/")
+def test_assignQuestionToSurvey(driver,base_url):
+    driver.get(base_url)
 
     # --- Connexion ---
     email_input = WebDriverWait(driver, 10).until(

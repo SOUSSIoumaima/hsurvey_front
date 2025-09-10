@@ -15,7 +15,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 @pytest.fixture
 def base_url():
     # prend l'URL depuis l'environnement, sinon fallback localhost
-    return os.environ.get("REACT_APP_API_URL", "http://localhost:3000")
+    return os.environ.get("REACT_APP_URL", "http://localhost:3000")
 # ------------------------------
 # Fixture Selenium avec options
 # ------------------------------
