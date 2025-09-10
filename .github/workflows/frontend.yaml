@@ -50,14 +50,19 @@ jobs:
       - name: Start full stack with Docker Compose
         run: |
           docker compose up -d
-          # attendre que le front et gateway répondent
-          for i in {1..30}; do
-            if curl -s http://localhost:3000 && curl -s http://localhost:8080; then
-              echo "Services ready!"
+          # attendre que tous les services HTTP soient prêts
+          for i in {1..60}; do
+            GATEWAY_OK=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health || echo 0)
+            FRONT_OK=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 || echo 0)
+            USER_OK=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health || echo 0)
+            ORG_OK=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health || echo 0)
+            SURVEY_OK=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health || echo 0)
+            if [ "$GATEWAY_OK" = "200" ] && [ "$FRONT_OK" = "200" ] && [ "$USER_OK" = "200" ] && [ "$ORG_OK" = "200" ] && [ "$SURVEY_OK" = "200" ]; then
+              echo "All services ready!"
               break
             fi
-            echo "Waiting..."
-            sleep 2
+            echo "Waiting for services..."
+            sleep 5
           done
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
@@ -65,9 +70,8 @@ jobs:
           SHARED_DB_USER: ${{ secrets.SHARED_DB_USER }}
           SHARED_DB_PASSWORD: ${{ secrets.SHARED_DB_PASSWORD }}
           SHARED_DB_NAME: ${{ secrets.SHARED_DB_NAME }}
-          REACT_APP_API_URL: http://gateway:8080/api
+          REACT_APP_API_URL: http://localhost:8080/api
           REACT_APP_URL: http://localhost:3000 
-          
 
       - name: Set up Python
         uses: actions/setup-python@v4
