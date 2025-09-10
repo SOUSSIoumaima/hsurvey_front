@@ -34,3 +34,40 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+  selenium-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Start full stack with Docker Compose
+        run: |
+          docker compose up -d
+          # attendre que le front et gateway répondent
+          for i in {1..30}; do
+            if curl -s http://localhost:3000 && curl -s http://localhost:8080; then
+              echo "Services ready!"
+              break
+            fi
+            echo "Waiting..."
+            sleep 2
+          done
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Selenium dependencies
+        run: |
+          pip install selenium pytest webdriver-manager
+
+      - name: Run Selenium tests
+        run: pytest tests/ --base-url=http://localhost:3000

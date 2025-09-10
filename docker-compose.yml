@@ -1,0 +1,152 @@
+services:
+  # Shared PostgreSQL Database
+  postgres:
+    image: postgres:15.0
+    container_name: shared-postgres
+    environment:
+      POSTGRES_USER: ${SHARED_DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${SHARED_DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${SHARED_DB_NAME:-maindb}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SHARED_DB_USER:-postgres} -d ${SHARED_DB_NAME:-maindb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis Rate Limiting
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - redis_data:/data
+
+  # Gateway Service 
+  gateway:
+    image: ghcr.io/horizon-school-of-digital-technologies/hsurvey_api_gateway:20250828-073746
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-900000}
+      INTERNAL_SERVICE_SECRET: ${INTERNAL_SERVICE_SECRET}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      RATE_LIMIT_REPLENISH_RATE: ${RATE_LIMIT_REPLENISH_RATE:-10}
+      RATE_LIMIT_BURST_CAPACITY: ${RATE_LIMIT_BURST_CAPACITY:-20}
+      RATE_LIMIT_REQUESTED_TOKENS: ${RATE_LIMIT_REQUESTED_TOKENS:-1}
+      HEALTH_CHECK_URL: ${GATEWAY_HEALTH_CHECK_URL:-http://localhost:8080/actuator/health}
+    depends_on:
+      redis:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+      organization-service:
+        condition: service_started
+      survey-service:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "${GATEWAY_HEALTH_CHECK_URL:-http://localhost:8080/actuator/health}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # User Service
+  user-service:
+    image: ghcr.io/horizon-school-of-digital-technologies/hsurvey_user_management:20250831-151831
+    container_name: user-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/${SHARED_DB_NAME:-maindb}?currentSchema=user_service"
+      SPRING_DATASOURCE_USERNAME: ${SHARED_DB_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${SHARED_DB_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-900000}
+      INTERNAL_SERVICE_SECRET: ${INTERNAL_SERVICE_SECRET}
+      GATEWAY_HOST: gateway
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "${USER_SERVICE_HEALTH_CHECK_URL:-http://localhost:8080/actuator/health}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Organization Service
+  organization-service:
+    image: ghcr.io/horizon-school-of-digital-technologies/hsurvey_org_management:20250905-214930
+    container_name: organization-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/${SHARED_DB_NAME:-maindb}?currentSchema=organization_service"
+      SPRING_DATASOURCE_USERNAME: ${SHARED_DB_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${SHARED_DB_PASSWORD:-postgres}
+      INTERNAL_SERVICE_SECRET: ${INTERNAL_SERVICE_SECRET}
+      GATEWAY_HOST: gateway
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "${ORG_SERVICE_HEALTH_CHECK_URL:-http://localhost:8080/actuator/health}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Survey Service
+  survey-service:
+    image: ghcr.io/horizon-school-of-digital-technologies/hsurvey_survey_service:20250908-103510
+    container_name: survey-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/${SHARED_DB_NAME:-maindb}?currentSchema=survey_service"
+      SPRING_DATASOURCE_USERNAME: ${SHARED_DB_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${SHARED_DB_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-900000}
+      INTERNAL_SERVICE_SECRET: ${INTERNAL_SERVICE_SECRET}
+      GATEWAY_HOST: gateway
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "${SURVEY_SERVICE_HEALTH_CHECK_URL:-http://localhost:8080/actuator/health}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend React App
+  front:
+    image: ghcr.io/horizon-school-of-digital-technologies/hsurvey_frontend:20250903-151554
+    container_name: front
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+    depends_on:
+      - gateway
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
+  redis_data:
