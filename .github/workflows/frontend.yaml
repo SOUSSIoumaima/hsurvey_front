@@ -51,7 +51,7 @@ jobs:
         run: |
           docker compose up -d
           # attendre que le front et gateway répondent
-            for i in {1..30}; do
+            for i in {1..60}; do
             if curl -s http://localhost:3000 && curl -s http://localhost:8080; then
               echo "Services ready!"
               break
