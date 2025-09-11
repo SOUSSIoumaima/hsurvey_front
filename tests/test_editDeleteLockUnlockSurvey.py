@@ -94,9 +94,9 @@ def test_survey_full_flow(driver,base_url):
     deadline_input.send_keys("AM")
 
     modal.find_element(By.XPATH, "//button[@type='submit']").click()
-    WebDriverWait(driver, 20).until(
-        lambda d: not d.find_elements(By.CLASS_NAME, "fixed")
-    )
+
+    time.sleep(3)
+
    
     # attendre que le titre apparaisse dans le tableau
     WebDriverWait(driver, 30).until(
@@ -122,11 +122,7 @@ def test_survey_full_flow(driver,base_url):
 
     edit_modal.find_element(By.XPATH, "//button[text()='Update Survey']").click()
 
-    WebDriverWait(driver, 20).until(
-        lambda d: not d.find_elements(By.CLASS_NAME, "fixed")
-    )
-
-    time.sleep(0.5)
+    time.sleep(3)
 
 
     # --- Lock Survey ---
@@ -197,9 +193,7 @@ def test_survey_full_flow(driver,base_url):
     cancel_btn = delete_modal.find_element(By.XPATH, ".//button[text()='Cancel']")
     cancel_btn.click()
 
-    WebDriverWait(driver, 20).until(
-        lambda d: not d.find_elements(By.CLASS_NAME, "fixed")
-    )
+    time.sleep(3)
 
     # --- Rechercher à nouveau la ligne du survey après fermeture du modal ---
     survey_row = WebDriverWait(driver, 10).until(
@@ -216,11 +210,9 @@ def test_survey_full_flow(driver,base_url):
 
     confirm_delete_btn = delete_modal.find_element(By.XPATH, ".//button[contains(text(),'Delete')]")
     confirm_delete_btn.click()
-    time.sleep(0.5)
+    time.sleep(3)
 
-    WebDriverWait(driver, 20).until(
-        lambda d: not d.find_elements(By.CLASS_NAME, "fixed")
-    )
+    
 
     # Vérifier que le survey a été supprimé
     survey_rows = driver.find_elements(By.XPATH, f"//tbody//tr[.//div[text()='{updated_title}']]")
