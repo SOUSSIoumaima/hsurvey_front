@@ -104,9 +104,8 @@ def test_create_multiple_surveys_for_search(driver,base_url):
         WebDriverWait(modal, 10).until(EC.element_to_be_clickable(submit_btn))
         submit_btn.click()
 
-        # Attendre que la modal disparaisse
         WebDriverWait(driver, 20).until(
-            EC.invisibility_of_element(modal)
+            lambda d: not d.find_elements(By.CLASS_NAME, "fixed")
         )
 
         # Vérifier que le survey apparaît dans le tableau
