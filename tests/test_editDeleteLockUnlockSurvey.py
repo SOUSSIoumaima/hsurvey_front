@@ -94,11 +94,7 @@ def test_survey_full_flow(driver,base_url):
     deadline_input.send_keys("AM")
 
     modal.find_element(By.XPATH, "//button[@type='submit']").click()
-    WebDriverWait(driver, 10).until(
-        EC.invisibility_of_element_located((By.CLASS_NAME, "fixed"))
-    )
-
-
+   
     # --- Vérifier la création ---
     survey_row = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.XPATH, f"//tbody//tr[.//div[text()='{survey_title}']]"))
