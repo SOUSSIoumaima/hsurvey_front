@@ -76,45 +76,44 @@ def test_create_multiple_surveys_for_search(driver,base_url):
 
     # --- Fonction pour créer un survey ---
     def create_survey(title, response_type):
-        # --- Ouvrir la modal ---
-        create_survey_btn = WebDriverWait(driver, 10).until(
+        # Ouvrir la modal
+        create_survey_btn = WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Create Survey')]"))
         )
-        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", create_survey_btn)
         create_survey_btn.click()
 
-        modal = WebDriverWait(driver, 10).until(
-           EC.presence_of_element_located((By.CLASS_NAME, "fixed"))
+        modal = WebDriverWait(driver, 20).until(
+            EC.visibility_of_element_located((By.CLASS_NAME, "fixed"))
         )
-        time.sleep(0.5)  # pour que la modal soit prête
 
-        # --- Remplir le formulaire ---
-        modal.find_element(By.NAME, "title").send_keys(title)
+        # Remplir le formulaire
+        WebDriverWait(modal, 10).until(
+            EC.presence_of_element_located((By.NAME, "title"))
+        ).send_keys(title)
         modal.find_element(By.NAME, "description").send_keys(f"Description pour {title}")
         modal.find_element(By.NAME, "type").send_keys("FEEDBACK")
         modal.find_element(By.NAME, "responseType").send_keys(response_type)
 
+         # Remplir la date avec format correct
         deadline_input = modal.find_element(By.ID, "deadline")
-        deadline_input.click()
-        deadline_input.send_keys("23102025")
-        deadline_input.send_keys(Keys.ARROW_RIGHT)
-        deadline_input.send_keys("0209")
-        deadline_input.send_keys(Keys.ARROW_RIGHT)
-        deadline_input.send_keys("AM")
+        driver.execute_script("arguments[0].value = '';", deadline_input)
+        deadline_input.send_keys("23/10/2025 02:09 AM")
 
-        # --- Cliquer sur submit ---
+        # Cliquer sur Submit
         submit_btn = modal.find_element(By.XPATH, "//button[@type='submit']")
-        driver.execute_script("arguments[0].click();", submit_btn)
+        WebDriverWait(modal, 10).until(EC.element_to_be_clickable(submit_btn))
+        submit_btn.click()
 
-        # --- Attendre que la modal disparaisse ---
-        WebDriverWait(driver, 30).until(
-            EC.invisibility_of_element_located((By.CLASS_NAME, "fixed"))
+        # Attendre que la modal disparaisse
+        WebDriverWait(driver, 20).until(
+            EC.invisibility_of_element(modal)
         )
 
-        # --- Vérifier que le survey apparaît dans le tableau ---
-        WebDriverWait(driver, 30).until(
+        # Vérifier que le survey apparaît dans le tableau
+        WebDriverWait(driver, 20).until(
             EC.text_to_be_present_in_element((By.TAG_NAME, "tbody"), title)
         )
+
 
     # --- Créer plusieurs surveys ---
     surveys_to_create = [

@@ -94,6 +94,8 @@ def test_survey_full_flow(driver,base_url):
     deadline_input.send_keys("AM")
 
     modal.find_element(By.XPATH, "//button[@type='submit']").click()
+    modal = driver.find_element(By.CLASS_NAME, "fixed")
+    WebDriverWait(driver, 20).until(EC.staleness_of(modal))
    
     # attendre que le titre apparaisse dans le tableau
     WebDriverWait(driver, 30).until(
@@ -119,9 +121,9 @@ def test_survey_full_flow(driver,base_url):
 
     edit_modal.find_element(By.XPATH, "//button[text()='Update Survey']").click()
 
-    WebDriverWait(driver, 10).until(
-        EC.invisibility_of_element_located((By.CLASS_NAME, "fixed"))
-    )
+    modal = driver.find_element(By.CLASS_NAME, "fixed")
+    WebDriverWait(driver, 20).until(EC.staleness_of(modal))
+
     time.sleep(0.5)
 
 
@@ -192,7 +194,8 @@ def test_survey_full_flow(driver,base_url):
     # --- Tester le bouton Cancel ---
     cancel_btn = delete_modal.find_element(By.XPATH, ".//button[text()='Cancel']")
     cancel_btn.click()
-    WebDriverWait(driver, 10).until(EC.invisibility_of_element(delete_modal))
+    modal = driver.find_element(By.CLASS_NAME, "fixed")
+    WebDriverWait(driver, 20).until(EC.staleness_of(modal))
 
     # --- Rechercher à nouveau la ligne du survey après fermeture du modal ---
     survey_row = WebDriverWait(driver, 10).until(
