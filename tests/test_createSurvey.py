@@ -107,7 +107,9 @@ def test_create_multiple_surveys_for_search(driver,base_url):
         driver.execute_script("arguments[0].click();", submit_btn)
 
         # --- Attendre que la modal disparaisse ---
-        WebDriverWait(driver, 10).until(EC.invisibility_of_element(modal))
+        WebDriverWait(driver, 10).until(
+            EC.invisibility_of_element_located((By.CLASS_NAME, "fixed"))
+        )
 
         # --- Vérifier que le survey a été créé ---
         survey_row = WebDriverWait(driver, 10).until(
