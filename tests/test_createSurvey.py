@@ -1,6 +1,7 @@
 import pytest
 import time
 import os
+import tempfile
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -21,13 +22,20 @@ def base_url():
 def driver():
     chrome_options = Options()
     
-    # Désactive la détection Selenium par Chrome
+    # Mode Headless pour CI
+    chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+
+    # Profil utilisateur temporaire unique
+    user_data_dir = tempfile.mkdtemp()
+    chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
+
+    # Désactive la détection Selenium
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     
-    # Lance en mode incognito (évite les mots de passe enregistrés)
+    # Incognito et désactivation gestionnaire mots de passe
     chrome_options.add_argument("--incognito")
-    
-    # Désactive complètement le gestionnaire de mots de passe
     chrome_options.add_experimental_option("prefs", {
         "credentials_enable_service": False,
         "profile.password_manager_enabled": False
@@ -40,6 +48,7 @@ def driver():
     driver.maximize_window()
     yield driver
     driver.quit()
+
 
 @pytest.mark.order(6)
 def test_create_multiple_surveys_for_search(driver,base_url):
