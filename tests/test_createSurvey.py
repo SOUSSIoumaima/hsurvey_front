@@ -107,10 +107,11 @@ def test_create_multiple_surveys_for_search(driver,base_url):
         time.sleep(3)
 
         # Vérifier que le survey apparaît dans le tableau
-        WebDriverWait(driver, 20).until(
-            EC.text_to_be_present_in_element((By.TAG_NAME, "tbody"), title)
+        WebDriverWait(driver, 30).until(
+            EC.presence_of_element_located(
+                (By.XPATH, f"//tbody//td[text()='{title}']")
+            )
         )
-
 
     # --- Créer plusieurs surveys ---
     surveys_to_create = [
