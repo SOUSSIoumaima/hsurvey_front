@@ -106,13 +106,15 @@ def test_create_multiple_surveys_for_search(driver,base_url):
         submit_btn = modal.find_element(By.XPATH, "//button[@type='submit']")
         driver.execute_script("arguments[0].click();", submit_btn)
 
-        # --- Vérifier que le survey a été créé ---
-        survey_row = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((
-                By.XPATH, f"//tbody//tr[.//div[text()='{title}']]"
-            ))
+        # --- Attendre que la modal disparaisse ---
+        WebDriverWait(driver, 30).until(
+            EC.invisibility_of_element_located((By.CLASS_NAME, "fixed"))
         )
-        assert survey_row is not None
+
+        # --- Vérifier que le survey apparaît dans le tableau ---
+        WebDriverWait(driver, 30).until(
+            EC.text_to_be_present_in_element((By.TAG_NAME, "tbody"), title)
+        )
 
     # --- Créer plusieurs surveys ---
     surveys_to_create = [

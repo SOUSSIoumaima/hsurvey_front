@@ -94,11 +94,7 @@ def test_survey_full_flow(driver,base_url):
     deadline_input.send_keys("AM")
 
     modal.find_element(By.XPATH, "//button[@type='submit']").click()
-   # attendre que la modal disparaisse
-    WebDriverWait(driver, 30).until(
-        EC.invisibility_of_element_located((By.CLASS_NAME, "fixed"))
-    )
-
+   
     # attendre que le titre apparaisse dans le tableau
     WebDriverWait(driver, 30).until(
         EC.text_to_be_present_in_element((By.TAG_NAME, "tbody"), survey_title)
@@ -123,7 +119,9 @@ def test_survey_full_flow(driver,base_url):
 
     edit_modal.find_element(By.XPATH, "//button[text()='Update Survey']").click()
 
-    WebDriverWait(driver, 10).until(EC.invisibility_of_element(edit_modal))
+    WebDriverWait(driver, 10).until(
+        EC.invisibility_of_element_located((By.CLASS_NAME, "fixed"))
+    )
     time.sleep(0.5)
 
 
