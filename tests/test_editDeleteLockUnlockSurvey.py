@@ -100,9 +100,7 @@ def test_survey_full_flow(driver,base_url):
    
     # Vérifier que le survey apparaît dans le tableau
     WebDriverWait(driver, 30).until(
-        EC.presence_of_element_located(
-            (By.XPATH, f"//tbody//td[text()='{survey_title}']")
-        )
+        EC.presence_of_element_located((By.XPATH, f"//tbody//tr[.//div[text()='{survey_title}']]"))
     )
 
     survey_row = driver.find_element(By.XPATH, f"//tbody//tr[.//div[text()='{survey_title}']]")

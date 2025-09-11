@@ -108,9 +108,7 @@ def test_create_multiple_surveys_for_search(driver,base_url):
 
         # Vérifier que le survey apparaît dans le tableau
         WebDriverWait(driver, 30).until(
-            EC.presence_of_element_located(
-                (By.XPATH, f"//tbody//td[text()='{title}']")
-            )
+            EC.presence_of_element_located((By.XPATH, f"//tbody//tr[.//div[text()='{title}']]"))
         )
 
     # --- Créer plusieurs surveys ---
